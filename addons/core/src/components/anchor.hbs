@@ -1,0 +1,6 @@
+<a
+  ...attributes
+  href={{@href}}
+  class={{if (and @addActiveClass (is-active-url @href)) "active"}}
+  {{on "click" (transition-to-url @href)}}
+>{{yield}}</a>

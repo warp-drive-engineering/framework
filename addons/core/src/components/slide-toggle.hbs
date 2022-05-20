@@ -1,0 +1,16 @@
+<div class="slide-toggle__wrapper" ...attributes>
+  <button
+    type="button"
+    role="switch"
+    aria-checked={{if @checked "true" "false"}}
+    disabled={{@disabled}}
+    id={{this.id}}
+    class="slide-toggle__input"
+    {{on "click" (fn this.flip (fn (mut @checked)))}}
+  >
+    <span aria-hidden="true" hidden></span>
+  </button>
+  <label class="slide-toggle__label" for={{this.id}}>
+    {{yield}}
+  </label>
+</div>

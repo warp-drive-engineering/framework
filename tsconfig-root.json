@@ -46,6 +46,9 @@
       ],
       "@warp-drive/core-tests/tests/*": [
         "tests/core-test-app/tests/*"
+      ],
+      "@warp-drive/weather/*": [
+        "addons/weather/src/*"
       ]
     }
   },
