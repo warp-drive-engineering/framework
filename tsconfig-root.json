@@ -40,6 +40,12 @@
       ],
       "@warp-drive/core/*": [
         "addons/core/src/*"
+      ],
+      "@warp-drive/core-tests/*": [
+        "tests/core-test-app/app/*"
+      ],
+      "@warp-drive/core-tests/tests/*": [
+        "tests/core-test-app/tests/*"
       ]
     }
   },
