@@ -1,4 +1,4 @@
-import { tracked } from "@glimmer/tracking";
+import { tracked } from '@glimmer/tracking';
 
 export class AsyncValue<T> {
   @tracked data: T | null = null;

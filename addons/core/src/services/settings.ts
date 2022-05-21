@@ -1,11 +1,8 @@
-import type StorageService from "labor-employee-app/services/storage";
+import { dependentKeyCompat } from '@ember/object/compat';
+import Service, { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 
-import { dependentKeyCompat } from "@ember/object/compat";
-import Service, { inject as service } from "@ember/service";
-import { cached, tracked } from "@glimmer/tracking";
-
-import type { LaborStoreLocation } from "../types/entities/labor-store-location";
-import type { LaborUser } from "../types/entities/labor-user";
+import type StorageService from './storage';
 
 export type Settings = {
   useMetricWeather: boolean;
@@ -14,20 +11,16 @@ export type Settings = {
   showWeatherData: boolean;
   useCompactMode: boolean;
   showTimezoneDifferences: boolean;
-  compactOpenShifts: boolean;
-  compactScheduledShifts: boolean;
 };
 
 class TrackedSettings implements Settings {
-  declare _user: User;
+  declare _service: SettingsService;
   @tracked _useMetricWeather: boolean = false;
   @tracked _useDarkMode: boolean = false;
   @tracked _useSystemDarkModePreference: boolean = true;
   @tracked _showWeatherData: boolean = true;
   @tracked _useCompactMode: boolean = false;
   @tracked _showTimezoneDifferences: boolean = true;
-  @tracked _compactOpenShifts: boolean = false;
-  @tracked _compactScheduledShifts: boolean = false;
 
   @dependentKeyCompat
   get useMetricWeather() {
@@ -83,29 +76,11 @@ class TrackedSettings implements Settings {
     this.save();
   }
 
-  @dependentKeyCompat
-  get compactOpenShifts() {
-    return this._compactOpenShifts;
-  }
-  set compactOpenShifts(v: boolean) {
-    this._compactOpenShifts = v;
-    this.save();
+  constructor(settingsService: SettingsService) {
+    this._service = settingsService;
   }
 
-  @dependentKeyCompat
-  get compactScheduledShifts() {
-    return this._compactOpenShifts;
-  }
-  set compactScheduledShifts(v: boolean) {
-    this._compactOpenShifts = v;
-    this.save();
-  }
-
-  constructor(user: User) {
-    this._user = user;
-  }
-
-  toJSON() {
+  toJSON(): Settings {
     const {
       useMetricWeather,
       useDarkMode,
@@ -113,7 +88,6 @@ class TrackedSettings implements Settings {
       showWeatherData,
       useCompactMode,
       showTimezoneDifferences,
-      compactOpenShifts,
     } = this;
     return {
       useMetricWeather,
@@ -122,51 +96,27 @@ class TrackedSettings implements Settings {
       showWeatherData,
       useCompactMode,
       showTimezoneDifferences,
-      compactOpenShifts,
     };
   }
 
-  save() {
-    this._user.storage.setValue("app-settings", this);
+  save(): void {
+    this._service.storage.setValue('app-settings', this);
   }
 }
 
-export default class User extends Service {
-  @tracked _user: LaborUser | null = null;
+export default class SettingsService extends Service {
   @service declare storage: StorageService;
-  @tracked declare settings: Settings;
+  @tracked declare state: Settings;
 
   constructor(args: object) {
     super(args);
-    const settingsData: Settings | void = this.storage.getValue("app-settings");
+    const settingsData: Settings | void = this.storage.getValue('app-settings');
     const settings = new TrackedSettings(this);
 
     if (settingsData) {
       Object.assign(settings, settingsData);
     }
 
-    this.settings = settings;
-  }
-
-  @cached
-  get locations(): Set<LaborStoreLocation> {
-    const locations = new Set<LaborStoreLocation>();
-    this._user!.employeeRecords.forEach((record) => {
-      locations.add(record.storeLocation);
-    });
-    return locations;
-  }
-
-  @cached
-  get locationZips(): string[] {
-    const zips: string[] = [];
-    this.locations.forEach((location) => {
-      zips.push(location.zip);
-    });
-    return zips;
-  }
-
-  setUser(user: LaborUser): void {
-    this._user = user;
+    this.state = settings;
   }
 }

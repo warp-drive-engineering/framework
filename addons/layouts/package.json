@@ -1,5 +1,5 @@
 {
-  "name": "@warp-drive/weather",
+  "name": "@warp-drive/layouts",
   "description": "Add your description here",
   "version": "0.0.0",
   "private": false,
@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:warp-drive-engineering/framework.git",
-    "directory": "addons/weather"
+    "directory": "addons/layouts"
   },
   "homepage": "https://github.com/warp-drive-engineering/framework",
   "bugs": "https://github.com/warp-drive-engineering/framework/issues",
@@ -22,8 +22,8 @@
     "@embroider/addon-shim": "^1.5.0"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*",
+    ".": "./dist/src/index.js",
+    "./*": "./dist/src/*",
     "./addon-main.js": "./addon-main.js"
   },
   "files": [
@@ -40,15 +40,10 @@
     "type": "addon",
     "version": 2,
     "app-js": {},
-    "public-assets": {
-      "./public/weather-codes.json": "/assets/weather-codes.json"
-    }
+    "public-assets": {}
   },
-  "peerDependencies": {
-    "@glimmer/tracking": "^1.1.2"
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "@glimmer/tracking": "^1.1.2",
     "@embroider/addon-dev": "^1.6.0",
     "rollup": "^2.74.1",
     "@babel/core": "^7.18.0",

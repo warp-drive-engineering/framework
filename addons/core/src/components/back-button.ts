@@ -1,7 +1,7 @@
-import { action } from "@ember/object";
-import type RouterService from "@ember/routing/router-service";
-import { inject as service } from "@ember/service";
-import Component from "@glimmer/component";
+import { action } from '@ember/object';
+import type RouterService from '@ember/routing/router-service';
+import { inject as service } from '@ember/service';
+import Component from '@glimmer/component';
 
 export default class extends Component<{ fallback: string }> {
   @service declare router: RouterService;

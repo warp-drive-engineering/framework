@@ -81,9 +81,10 @@ module.exports = {
     'no-prototype-builtins': 'error',
 
     // these are a nice proxy measurement of where there is complexity to pay down
+    // but not hugely important to always follow since they are easily trollish
     'max-params': ['error', { max: 4 }],
     'max-depth': ['error', { max: 4 }],
-    'max-statements': ['error', { max: 20 }],
+    'max-statements': ['error', { max: 40 }],
     'max-lines-per-function': [
       'error',
       { max: 80, skipBlankLines: true, skipComments: true },
@@ -387,6 +388,7 @@ module.exports = {
         'apps/*/index.js',
         'engines/*/index.js',
         'addons/*/index.js',
+        'addons/*/addon-main.js',
       ],
       parserOptions: {
         sourceType: 'script',

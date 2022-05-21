@@ -23,8 +23,8 @@
     "lint:hbs": "ember-template-lint .",
     "lint:jsts": "eslint . --cache",
     "check:types": "tsc -p ./tsconfig.json --noEmit --pretty false",
-    "start:core-test-app": "cd tests/core-test-app && npx start",
-    "start:weather-test-app": "cd tests/weather-test-app && npx start"
+    "start:core-test-app": "cd tests/core-test-app && pnpm run start",
+    "start:weather-test-app": "cd tests/weather-test-app && pnpm run start"
   },
   "repository": {
     "type": "git",

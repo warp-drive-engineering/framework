@@ -1,4 +1,4 @@
-import Service from "@ember/service";
+import Service from '@ember/service';
 
 export default class extends Service {
   elements: Record<string, HTMLElement> = {};
@@ -6,8 +6,8 @@ export default class extends Service {
   constructor(...args: object[]) {
     super(...args);
 
-    const element = document.createElement("div");
-    element.classList.add("page-header__content");
+    const element = document.createElement('div');
+    element.classList.add('page-header__content');
     this.elements.pageHeader = element;
   }
 }

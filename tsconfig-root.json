@@ -33,7 +33,8 @@
         "node_modules/ember-intl/addon/*"
       ],
       "fetch": [
-        "node_modules/ember-fetch"
+        "node_modules/ember-fetch",
+        "addons/core/node_modules/ember-fetch"
       ],
       "*": [
         "types/*"
@@ -55,6 +56,9 @@
       ],
       "@warp-drive/weather-tests/tests/*": [
         "tests/weather-test-app/tests/*"
+      ],
+      "@warp-drive/layouts/*": [
+        "addons/layouts/src/*"
       ]
     }
   },

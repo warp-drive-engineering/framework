@@ -1,8 +1,9 @@
-import { assert } from "@ember/debug";
-import { action } from "@ember/object";
-import Component from "@glimmer/component";
-import { cached, tracked } from "@glimmer/tracking";
+import { assert } from '@ember/debug';
+import { action } from '@ember/object';
+import Component from '@glimmer/component';
+import { cached, tracked } from '@glimmer/tracking';
 
+const PULL_TRIGGER_THRESHOLD = 75;
 class RequestState {
   @tracked isPending = true;
   @tracked isResolved = false;
@@ -26,7 +27,7 @@ export default class extends Component<{
 
   @cached
   get triggerThreshold() {
-    return this.args.triggerThreshold || 75;
+    return this.args.triggerThreshold || PULL_TRIGGER_THRESHOLD;
   }
 
   @action
@@ -35,7 +36,7 @@ export default class extends Component<{
     const req = (state.request = new RequestState());
     assert(
       `Expected a refresh method to be passed to pull-to-refresh`,
-      typeof this.args.refresh === "function"
+      typeof this.args.refresh === 'function'
     );
     try {
       await this.args.refresh();
@@ -45,7 +46,6 @@ export default class extends Component<{
       cleanup();
     } catch (error: unknown) {
       assert(`Expected an instance of an error`, error instanceof Error);
-      console.log({ error });
       req.error = error;
       req.isFulfilled = true;
       req.isRejected = true;

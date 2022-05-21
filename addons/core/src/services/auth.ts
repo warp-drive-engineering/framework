@@ -1,7 +1,8 @@
 import fetch from 'fetch';
-import config from 'labor-employee-app/config/environment';
 
+import { getOwner } from '@ember/application';
 import { assert } from '@ember/debug';
+import RegistryProxyMixin from '@ember/engine/-private/registry-proxy-mixin';
 import type RouterService from '@ember/routing/router-service';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
@@ -10,6 +11,14 @@ import type NetworkService from './network';
 import type { RequestOptions } from './network';
 import type StorageService from './storage';
 
+interface Config {
+  sessionKey?: string;
+  sessionTokenKey?: string;
+  apiHost: string;
+  apiNamespace: string;
+}
+
+const LAUNCH_ANIMATION_DURATION = 800;
 export default class extends Service {
   @service declare network: NetworkService;
   @service declare storage: StorageService;
@@ -19,10 +28,11 @@ export default class extends Service {
   @tracked sessionUserId: string | null = null;
   @tracked sessionToken: string = '';
 
-  sessionKey = `craftable-session-user-id`;
-  sessionTokenKey = `craftable-session-token`;
+  declare config: Config;
+  declare sessionKey: string;
+  declare sessionTokenKey: string;
 
-  constructor(...args: Object[]) {
+  constructor(...args: object[]) {
     super(...args);
     const id = this.storage.getValue<string>(this.sessionKey);
     const token = this.storage.getValue<string>(this.sessionTokenKey);
@@ -32,10 +42,16 @@ export default class extends Service {
       this.sessionUserId = id;
       this.sessionToken = token;
     }
+
+    const owner: RegistryProxyMixin = getOwner(this) as RegistryProxyMixin;
+    this.config = owner.resolveRegistration('config:environment') as Config;
+
+    this.sessionKey = this.config.sessionKey || `session-user-id`;
+    this.sessionTokenKey = this.config.sessionTokenKey || `session-token`;
   }
 
   async logout(delay: number = 0): Promise<void> {
-    await fetch(`${config.apiHost}/signout`, {
+    await fetch(`${this.config.apiHost}/signout`, {
       credentials: 'include',
       mode: 'cors',
     });
@@ -53,14 +69,16 @@ export default class extends Service {
       const launchScreen = document.querySelector('#launch-screen');
       assert(`Expected the #launchScreen to still be in DOM`, launchScreen);
       launchScreen.classList.remove('hidden');
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) =>
+        setTimeout(resolve, LAUNCH_ANIMATION_DURATION)
+      );
     }
     window.location.href = newUrl;
   }
 
   async attemptLogin(email: string, password: string): Promise<void> {
     const options: RequestOptions = {
-      url: `${config.apiHost}/${config.apiNamespace}login`,
+      url: `${this.config.apiHost}/${this.config.apiNamespace}login`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -11,6 +11,7 @@ specifiers:
   '@babel/runtime': ^7.18.0
   '@embroider/addon-dev': ^1.6.0
   '@embroider/addon-shim': ^1.5.0
+  '@glimmer/tracking': ^1.1.2
   '@rollup/plugin-babel': ^5.3.1
   '@rollup/plugin-typescript': ^8.3.2
   rollup: ^2.74.1
@@ -31,6 +32,7 @@ devDependencies:
   '@babel/preset-typescript': 7.17.12_@babel+core@7.18.0
   '@babel/runtime': 7.18.0
   '@embroider/addon-dev': 1.6.0_rollup@2.74.1
+  '@glimmer/tracking': 1.1.2
   '@rollup/plugin-babel': 5.3.1_ykg7cmcqpmn5fbkb5gxs7i3du4
   '@rollup/plugin-typescript': 8.3.2_ewnwotriipvq7wps276zlnnxuy
   rollup: 2.74.1
@@ -1299,6 +1301,21 @@ packages:
       resolve-package-path: 4.0.3
       semver: 7.3.7
       typescript-memoize: 1.1.0
+
+  /@glimmer/env/0.1.7:
+    resolution: {integrity: sha512-JKF/a9I9jw6fGoz8kA7LEQslrwJ5jms5CXhu/aqkBWk+PmZ6pTl8mlb/eJ/5ujBGTiQzBhy5AIWF712iA+4/mw==}
+    dev: true
+
+  /@glimmer/tracking/1.1.2:
+    resolution: {integrity: sha512-cyV32zsHh+CnftuRX84ALZpd2rpbDrhLhJnTXn9W//QpqdRZ5rdMsxSY9fOsj0CKEc706tmEU299oNnDc0d7tA==}
+    dependencies:
+      '@glimmer/env': 0.1.7
+      '@glimmer/validator': 0.44.0
+    dev: true
+
+  /@glimmer/validator/0.44.0:
+    resolution: {integrity: sha512-i01plR0EgFVz69GDrEuFgq1NheIjZcyTy3c7q+w7d096ddPVeVcRzU3LKaqCfovvLJ+6lJx40j45ecycASUUyw==}
+    dev: true
 
   /@jridgewell/gen-mapping/0.1.1:
     resolution: {integrity: sha512-sQXCasFk+U8lWYEe66WxRDOE9PjVz4vSM51fTu3Hw+ClTpUSQb718772vH3pyS5pShp6lvQM7SxgIDXXXmOX7w==}

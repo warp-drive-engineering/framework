@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import Service from "@ember/service";
+import Service from '@ember/service';
 
 export default class extends Service {
   getValue<T>(key: string): T | void {

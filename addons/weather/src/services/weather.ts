@@ -1,21 +1,23 @@
-import config from '@craftable/labor-employee-engine/config/environment';
-import type { CountryIso2Code } from '@craftable/labor-employee-engine/types/countries';
-import type { ScheduleShift } from '@craftable/labor-employee-engine/types/entities/schedule-shift';
-import type { SupportedLocales } from '@craftable/labor-employee-engine/types/languages';
-import type NetworkService from 'labor-employee-app/services/network';
-import type StorageService from 'labor-employee-app/services/storage';
+/* eslint-disable no-magic-numbers */
+import type NetworkService from '@warp-drive/core/services/network';
+import type SettingsService from '@warp-drive/core/services/settings';
+import type { Settings } from '@warp-drive/core/services/settings';
+import type StorageService from '@warp-drive/core/services/storage';
+import type { CountryIso2Code } from '@warp-drive/core/types/countries';
+import type { YYYY_MM_DD } from '@warp-drive/core/types/date-and-time';
+import type { SupportedLocales } from '@warp-drive/core/types/languages';
+import { AsyncValue } from '@warp-drive/core/utils/async-value';
 
+import { getOwner } from '@ember/application';
 import { assert } from '@ember/debug';
+import type RegistryProxyMixin from '@ember/engine/-private/registry-proxy-mixin';
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
-import type { YYYY_MM_DD } from '../types/date-and-time';
-import { AsyncValue } from '../utils/async-value';
-import type { ShiftDay } from './days';
-import type UserService from './user';
-import type { Settings } from './user';
-
-const { weatherStackApiKey, weatherCacheExpires } = config;
+interface Config {
+  weatherStackApiKey: string;
+  weatherCacheExpires: number;
+}
 
 export type SingleLocationWeatherData = {
   request: {
@@ -189,15 +191,17 @@ const FARENHEIT_COUNTRIES = new Set([
   'US',
 ]);
 
+// eslint-disable-next-line no-magic-numbers
 const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
 
 function shortIsoCode(lang: SupportedLocales): string {
   return lang.split('-')[0];
 }
+const YEAR_LEN = 4;
 function oneYearPrior(date: YYYY_MM_DD): YYYY_MM_DD {
-  const year = date.slice(0, 4);
+  const year = date.slice(0, YEAR_LEN);
   const newYear = String(Number(year) - 1);
-  return `${newYear}${date.slice(4)}` as YYYY_MM_DD;
+  return `${newYear}${date.slice(YEAR_LEN)}` as YYYY_MM_DD;
 }
 
 function formatHistoricalDate(date: Date): string {
@@ -288,12 +292,20 @@ function formatTemp(temp: number, settings: Settings): number {
 
 type ArrayType<T> = T extends (infer Item)[] ? Item : T;
 export default class extends Service {
+  declare config: Config;
+
+  constructor(...args: object[]) {
+    super(...args);
+    const owner: RegistryProxyMixin = getOwner(this) as RegistryProxyMixin;
+    this.config = owner.resolveRegistration('config:environment') as Config;
+  }
+
   @service declare network: NetworkService;
   // we utilize local storage for this response
   // because force-cache does not appear to work appropriately
   // with fetch when the response is not setting cache headers
   @service declare storage: StorageService;
-  @service declare user: UserService;
+  @service declare settings: SettingsService;
   @tracked weatherCodeData: Map<number, WeatherCode> | null = null;
 
   cached: CachedWeatherDataResponse | null = null;
@@ -322,7 +334,7 @@ export default class extends Service {
     if (!data) {
       data = report?.historical?.historical[oneYearPrior(day)];
     }
-    const { settings } = this.user;
+    const { state: settings } = this.settings;
 
     if (!data) {
       hourly = ['12am', '3am', '6am', '9am', '12pm', '3pm', '6pm', '9pm'].map(
@@ -403,7 +415,7 @@ export default class extends Service {
   }
 
   _updateZipcodes(request: CachedWeatherDataResponse) {
-    const theData = request.data.data;
+    let theData = request.data.data;
     if (Array.isArray(theData)) {
       theData.forEach((loc) => {
         this.zipcodeMap.set(loc.request.query, {
@@ -417,7 +429,7 @@ export default class extends Service {
     }
 
     if (request.historicalData) {
-      const theData = request.historicalData;
+      theData = request.historicalData;
       if (Array.isArray(theData)) {
         theData.forEach((loc) => {
           const cache = this.zipcodeMap.get(loc.request.query);
@@ -450,7 +462,7 @@ export default class extends Service {
     }
     this._isLoadingWeatherCodes = true;
     const data = await this.network.request<WeatherCode[]>({
-      url: '/@craftable/labor-employee-engine/assets/weather-codes.json',
+      url: 'assets/weather-codes.json',
       method: 'GET',
     });
     assert(`We received code data`, data);
@@ -462,29 +474,21 @@ export default class extends Service {
     this._isLoadingWeatherCodes = false;
   }
 
-  /**
-   * @param shifts an array of shifts sorted by startDate and startTime
-   */
-  async weatherDataForShifts(
-    shifts: ScheduleShift[],
-    days: ShiftDay[],
-    reload: boolean = false,
-    country: CountryIso2Code = 'US',
-    locale: SupportedLocales = 'en-us'
-  ): Promise<AsyncValue<WeatherData | null> | void> {
-    const weatherDataPromise = this.loadWeatherIconData();
-    // each unique zip counts as one query against our api quota
-    // we may want to cache by zips individually so we are only
-    // quering stale zip codes.
-    const zips =
-      shifts.length === 0
-        ? this.user.locationZips
-        : shifts.map((shift) => shift.storeLocation.zip);
-    const locations = [...new Set(zips)].join(';');
-    const firstDate: string = formatHistoricalDate(days[7].dateInstance);
-    const lastDate: string = formatHistoricalDate(
-      days[days.length - 1].dateInstance
-    );
+  _buildQueries({
+    zips,
+    dates,
+    country = 'US',
+    locale = 'en-us',
+  }: {
+    zips: Set<string>;
+    dates: Date[];
+    country: CountryIso2Code;
+    locale: SupportedLocales;
+  }) {
+    const { weatherStackApiKey } = this.config;
+    const locations = [...zips].join(';');
+    const firstDate: string = formatHistoricalDate(dates[7]);
+    const lastDate: string = formatHistoricalDate(dates[dates.length - 1]);
     const historicalDateQuery = `historical_date_start=${firstDate}&historical_date_end=${lastDate}`;
     const dateQuery = `forecast_days=7`;
     const localeQuery = locale.startsWith('en')
@@ -500,6 +504,39 @@ export default class extends Service {
 
     const historicalUrl = `https://api.weatherstack.com/historical?access_key=${weatherStackApiKey}${historicalParams}`;
     const url = `https://api.weatherstack.com/forecast?access_key=${weatherStackApiKey}${params}`;
+
+    return {
+      url,
+      historicalUrl,
+    };
+  }
+
+  // Note: each unique zip counts as one query against our api quota
+  // we may want to cache by zips individually so we are only
+  // quering stale zip codes.
+  async weatherDataFor({
+    zips,
+    dates,
+    reload = false,
+    country = 'US',
+    locale = 'en-us',
+  }: {
+    zips: Set<string>;
+    dates: Date[];
+    reload: boolean;
+    country: CountryIso2Code;
+    locale: SupportedLocales;
+  }): Promise<AsyncValue<WeatherData | null> | void> {
+    const { weatherCacheExpires } = this.config;
+
+    const weatherDataPromise = this.loadWeatherIconData();
+
+    const { historicalUrl, url } = this._buildQueries({
+      zips,
+      dates,
+      country,
+      locale,
+    });
 
     const cached = this.retrieve(url);
     if (

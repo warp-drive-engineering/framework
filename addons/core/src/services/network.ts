@@ -1,30 +1,42 @@
-// import type { Object as JSONResponse } from "json-typescript";
+import fetch from 'fetch';
 
-import fetch from "fetch";
-import Config from "labor-employee-app/config/environment";
+import { getOwner } from '@ember/application';
+import { assert } from '@ember/debug';
+import RegistryProxyMixin from '@ember/engine/-private/registry-proxy-mixin';
+import type RouterService from '@ember/routing/router-service';
+import Service, { inject as service } from '@ember/service';
 
-import { assert } from "@ember/debug";
-import type RouterService from "@ember/routing/router-service";
-import Service, { inject as service } from "@ember/service";
+import type AuthService from './auth';
 
-import type AuthService from "./auth";
+interface Config {
+  sessionKey?: string;
+  sessionTokenKey?: string;
+  apiHost: string;
+  apiNamespace: string;
+  fetchTimeout?: number;
+}
+
+const THIRTY_SECONDS = 30_000;
+const NOT_AUTHORIZED = 401;
+const NO_CONTENT = 204;
+const RESET_CONTENT = 205;
 
 export interface RequestOptions extends RequestInit {
   url: string;
   method: RequestType;
 }
 export type RequestType =
-  | "GET"
-  | "PUT"
-  | "PATCH"
-  | "POST"
-  | "DELETE"
-  | "OPTIONS"
-  | "HEAD";
+  | 'GET'
+  | 'PUT'
+  | 'PATCH'
+  | 'POST'
+  | 'DELETE'
+  | 'OPTIONS'
+  | 'HEAD';
 export interface RequestEntry<T extends object> {
   promise: Promise<Response>;
   result: Response | null;
-  status: "pending" | "processing" | "fulfilled" | "failed";
+  status: 'pending' | 'processing' | 'fulfilled' | 'failed';
   error: Error | null;
   /**
    * timestamp (long) since epoch in milliseconds
@@ -43,11 +55,31 @@ interface RequestOptionsSubset {
   method: RequestType;
 }
 
+function handlePossibleAbort<T extends object>(
+  request: RequestEntry<T>,
+  error: Error
+): Error {
+  let e = error;
+  if (error.message === 'Aborted' && request.controller.signal.aborted) {
+    const signal = request.controller.signal as AbortSignal & {
+      reason?: string;
+    };
+    e = new Error(signal.reason || error.message);
+  }
+  return e;
+}
 export default class extends Service {
   @service declare router: RouterService;
   @service declare auth: AuthService;
 
+  declare config: Config;
   #requests: Map<string, RequestEntry<object>> = new Map();
+
+  constructor(...args: object[]) {
+    super(...args);
+    const owner: RegistryProxyMixin = getOwner(this) as RegistryProxyMixin;
+    this.config = owner.resolveRegistration('config:environment') as Config;
+  }
 
   lookup<T extends Object>(key: string): RequestEntry<T> | undefined {
     return this.#requests.get(key) as RequestEntry<T>;
@@ -56,7 +88,7 @@ export default class extends Service {
   cacheKeyFor(options: RequestOptionsSubset) {
     const { method, url } = options;
     if (!method) {
-      method === "GET";
+      method === 'GET';
     }
 
     return `(${method}) ${url}`;
@@ -64,16 +96,16 @@ export default class extends Service {
 
   handleError(request: RequestEntry<object>): void {
     if (
-      request.result?.status === 401 &&
-      this.router.currentRouteName !== "signin"
+      request.result?.status === NOT_AUTHORIZED &&
+      this.router.currentRouteName !== 'signin'
     ) {
-      void this.router.transitionTo("auto-logout");
+      void this.router.transitionTo('auto-logout');
     }
   }
 
-  async request<T extends object>(options: RequestOptions) {
+  _initializeRequest<T extends object>(options: RequestOptions) {
     const { url } = options;
-    const { apiHost } = Config;
+    const { apiHost } = this.config;
     const headers: Record<string, string> = {};
 
     if (url.includes(apiHost)) {
@@ -82,7 +114,7 @@ export default class extends Service {
     }
 
     const finalizedOptions: FinalizedRequestInit = Object.assign(
-      { method: "GET", headers: {} },
+      { method: 'GET', headers: {} },
       options
     );
     const mandatoryHeaders = {};
@@ -97,7 +129,7 @@ export default class extends Service {
     const request: RequestEntry<T> = {
       options: finalizedOptions,
       promise: null as unknown as Promise<Response>,
-      status: "pending",
+      status: 'pending',
       result: null,
       error: null,
       data: null,
@@ -106,20 +138,28 @@ export default class extends Service {
     };
     request.options.signal = request.controller.signal;
     this.#requests.set(cacheKey, request);
+
+    return request;
+  }
+
+  async request<T extends object>(options: RequestOptions) {
+    const { url } = options;
+    const request = this._initializeRequest<T>(options);
+
     const id = setTimeout(
       () =>
         request.controller.abort(
           `Request was cancelled because no connection to the server was established after 10s.`
         ),
-      10_000
+      this.config.fetchTimeout || THIRTY_SECONDS
     );
     try {
       const result = (request.result = await (request.promise = fetch(
         url,
-        finalizedOptions
+        request.options
       )));
       clearTimeout(id);
-      request.status = "processing";
+      request.status = 'processing';
       request.lastUpdated = Date.now();
 
       let rawPayload: string | Error;
@@ -145,14 +185,16 @@ export default class extends Service {
 
       const { status } = result;
       const statusIndicatesEmptyResponse =
-        status === 204 || status === 205 || finalizedOptions.method === "HEAD";
+        status === NO_CONTENT ||
+        status === RESET_CONTENT ||
+        request.options.method === 'HEAD';
 
       request.data =
-        rawPayload === "" || rawPayload === null || statusIndicatesEmptyResponse
+        rawPayload === '' || rawPayload === null || statusIndicatesEmptyResponse
           ? null
           : (JSON.parse(rawPayload) as T);
 
-      request.status = "fulfilled";
+      request.status = 'fulfilled';
       request.lastUpdated = Date.now();
 
       return request.data;
@@ -162,21 +204,15 @@ export default class extends Service {
         `We expect a real error, got ${String(error)}`,
         error instanceof Error
       );
-      let e = error;
-      if (error.message === "Aborted" && request.controller.signal.aborted) {
-        const signal = request.controller.signal as AbortSignal & {
-          reason?: string;
-        };
-        e = new Error(signal.reason || error.message);
-      }
-      request.error = e;
-      request.status = "failed";
+
+      request.error = handlePossibleAbort(request, error);
+      request.status = 'failed';
       request.lastUpdated = Date.now();
 
       // TODO how to nicely allow this?
       this.handleError(request);
 
-      throw e;
+      throw request.error;
     }
   }
 }

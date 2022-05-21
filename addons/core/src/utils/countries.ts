@@ -4,9 +4,9 @@ import type {
   CountryIso2Code,
   CountryName,
   Province,
-} from '@craftable/labor-employee-engine/types/countries';
-import type { SupportedLocales } from '@craftable/labor-employee-engine/types/languages';
-import type { EN_US_Provinces } from '@craftable/labor-employee-engine/types/utils/province-list-en-us';
+} from '../types/countries';
+import type { SupportedLocales } from '../types/languages';
+import type { EN_US_Provinces } from '../types/utils/province-list-en-us';
 
 const A = 65;
 const Z = 90;

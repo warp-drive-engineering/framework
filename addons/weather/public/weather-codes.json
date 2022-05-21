@@ -1,0 +1,194 @@
+[
+  {
+    "code": 395,
+    "icon": "weather/wi-day-snow-thunderstorm"
+  },
+  {
+    "code": 392,
+    "icon": "weather/wi-day-snow-thunderstorm"
+  },
+  {
+    "code": 389,
+    "icon": "weather/wi-day-thunderstorm"
+  },
+  {
+    "code": 386,
+    "icon": "weather/wi-day-storm-showers"
+  },
+  {
+    "code": 377,
+    "icon": "weather/wi-day-hail"
+  },
+  {
+    "code": 374,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 371,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 368,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 365,
+    "icon": "weather/wi-day-sleet-storm"
+  },
+  {
+    "code": 362,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 359,
+    "icon": "weather/wi-day-rain"
+  },
+  {
+    "code": 356,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 353,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 350,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 338,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 335,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 332,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 329,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 326,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 323,
+    "icon": "weather/wi-day-snow"
+  },
+  {
+    "code": 320,
+    "icon": "weather/wi-day-sleet-storm"
+  },
+  {
+    "code": 317,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 314,
+    "icon": "weather/wi-day-rain-mix"
+  },
+  {
+    "code": 311,
+    "icon": "weather/wi-day-rain-mix"
+  },
+  {
+    "code": 308,
+    "icon": "weather/wi-day-rain"
+  },
+  {
+    "code": 305,
+    "icon": "weather/wi-day-rain"
+  },
+  {
+    "code": 302,
+    "icon": "weather/wi-day-rain"
+  },
+  {
+    "code": 299,
+    "icon": "weather/wi-day-rain"
+  },
+  {
+    "code": 296,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 293,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 284,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 281,
+    "icon": "weather/wi-day-sleet"
+  },
+  {
+    "code": 266,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 263,
+    "icon": "weather/wi-day-showers"
+  },
+  {
+    "code": 260,
+    "icon": "weather/wi-day-fog"
+  },
+  {
+    "code": 248,
+    "icon": "weather/wi-day-fog"
+  },
+  {
+    "code": 230,
+    "icon": "weather/wi-thunderstorm"
+  },
+  {
+    "code": 227,
+    "icon": "weather/wi-snow-wind"
+  },
+  {
+    "code": 200,
+    "icon": "weather/wi-lightning"
+  },
+  {
+    "code": 185,
+    "icon": "weather/wi-rain-mix"
+  },
+  {
+    "code": 182,
+    "icon": "weather/wi-sleet"
+  },
+  {
+    "code": 179,
+    "icon": "weather/wi-snow"
+  },
+  {
+    "code": 176,
+    "icon": "weather/wi-rain"
+  },
+  {
+    "code": 143,
+    "icon": "weather/wi-fog"
+  },
+  {
+    "code": 122,
+    "icon": "weather/wi-cloud"
+  },
+  {
+    "code": 119,
+    "icon": "weather/wi-cloudy"
+  },
+  {
+    "code": 116,
+    "icon": "weather/wi-cloud"
+  },
+  {
+    "code": 113,
+    "icon": "weather/wi-day-sunny"
+  }
+]
