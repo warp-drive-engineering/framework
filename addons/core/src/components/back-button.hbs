@@ -1,0 +1,7 @@
+<button
+  type="button"
+  aria-label={{if @label @label (t "misc.go-back")}}
+  {{on "click" this.goBack}}
+>
+  <Icon::Fa::AngleLeftSolid />
+</button>

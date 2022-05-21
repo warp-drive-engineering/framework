@@ -1,0 +1,49 @@
+<box class="page-body pull-to-refresh__container" ...attributes>
+  <div class="pull-to-refresh__refresh-box">
+    {{#if (has-block "refresh")}}
+      {{yield this.state to="refresh"}}
+    {{else}}
+      {{#if this.state.isRefreshing}}
+        <Icon::Fa::RotateSolid
+          role="presentation"
+          class="text-purple text-large
+            {{if this.state.isRefreshing 'animation-rotate'}}"
+        />
+      {{else}}
+        {{#if this.state.request.isResolved}}
+          <Icon::Fa::CheckSolid
+            role="presentation"
+            class="text-green text-large animation-pew-pew"
+          />
+        {{else if this.state.request.isRejected}}
+          <Icon::Fa::XmarkSolid
+            role="presentation"
+            class="text-red text-large animation-shake"
+          />
+        {{else}}
+          <Icon::Fa::RotateSolid
+            role="presentation"
+            class="text-purple text-large"
+          />
+        {{/if}}
+      {{/if}}
+    {{/if}}
+    <button
+      type="button"
+      class="screen-reader-only"
+      {{on "click" this.refresh}}
+    >
+      {{t "refresh-app"}}
+    </button>
+  </div>
+  <box
+    class="page-body pull-to-refresh__content-box apply-background"
+    {{pull-to-peek this.triggerThreshold this.refresh this.state}}
+  >
+    {{#if (has-block "page")}}
+      {{yield this.state to="page"}}
+    {{else}}
+      {{yield this.state}}
+    {{/if}}
+  </box>
+</box>
