@@ -59,6 +59,12 @@
       ],
       "@warp-drive/layouts/*": [
         "addons/layouts/src/*"
+      ],
+      "@warp-drive/layouts-tests/*": [
+        "tests/layouts-test-app/app/*"
+      ],
+      "@warp-drive/layouts-tests/tests/*": [
+        "tests/layouts-test-app/tests/*"
       ]
     }
   },
