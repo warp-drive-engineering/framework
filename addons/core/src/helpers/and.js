@@ -1,5 +1,5 @@
-import { helper } from "@ember/component/helper";
-import { assert } from "@ember/debug";
+import { helper } from '@ember/component/helper';
+import { assert } from '@ember/debug';
 
 export function and(params) {
   assert(

@@ -1,7 +1,9 @@
 <button
+  ...attributes
   type="button"
   aria-label={{if @label @label (t "misc.go-back")}}
   {{on "click" this.goBack}}
 >
+  {{! TODO make this mappable at build time?}}
   <Icon::Fa::AngleLeftSolid />
 </button>

@@ -1,14 +1,14 @@
-import { helper } from "@ember/component/helper";
+import { helper } from '@ember/component/helper';
 
 export function date(
   [date, timeZone]: [Date, string],
   { showYear }: { showYear?: boolean }
 ): string {
-  return date.toLocaleDateString("en-us", {
+  return date.toLocaleDateString('en-us', {
     timeZone,
-    year: showYear ? "numeric" : undefined,
-    day: "numeric",
-    month: "numeric",
+    year: showYear ? 'numeric' : undefined,
+    day: 'numeric',
+    month: 'numeric',
   });
 }
 

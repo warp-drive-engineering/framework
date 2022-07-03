@@ -1,4 +1,4 @@
-import { helper } from "@ember/component/helper";
+import { helper } from '@ember/component/helper';
 
 interface Address {
   addr1: string;
@@ -11,10 +11,10 @@ interface Address {
 
 export function encode([address]: [Address]): string {
   const query = encodeURI(
-    `${address.addr1}${address.addr2 ? " " + address.addr2 : ""}, ${
+    `${address.addr1}${address.addr2 ? ' ' + address.addr2 : ''}, ${
       address.city
     }, ${address.state} ${address.zip} ${
-      address.country ? address.country : ""
+      address.country ? address.country : ''
     }`
   );
   return `https://www.google.com/maps/dir/?api=1&dir_action=navigate&destination=${query}`;
