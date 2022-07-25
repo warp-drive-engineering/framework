@@ -46,7 +46,7 @@
   "devDependencies": {
     "release-it": "^14.0.0",
     "release-it-yarn-workspaces": "^2.0.1",
-    "release-it-lerna-changelog": "^4.0.1",
+    "release-it-lerna-changelog": "^5.0.0",
     "@babel/plugin-proposal-decorators": "^7.17.12",
     "@babel/eslint-parser": "^7.17.0",
     "@glimmer/component": "^1.1.2",
