@@ -45,7 +45,7 @@
   "pnpm": {},
   "devDependencies": {
     "release-it": "^14.0.0",
-    "release-it-yarn-workspaces": "^2.0.1",
+    "release-it-yarn-workspaces": "^3.0.0",
     "release-it-lerna-changelog": "^4.0.1",
     "@babel/plugin-proposal-decorators": "^7.17.12",
     "@babel/eslint-parser": "^7.17.0",
